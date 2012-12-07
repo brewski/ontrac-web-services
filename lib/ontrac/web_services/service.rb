@@ -95,7 +95,7 @@ module Ontrac::WebServices
         raise err
       rescue Exception => root_exception
         err = ServiceException.new(root_exception.message)
-        err.details = { request: request_xml, response: response_xml }
+        err.details = { request: request_xml.to_s, response: response.body }
         err.set_backtrace([ "#{__FILE__}:#{__LINE__ + 1}", *root_exception.backtrace ])
         raise err
       end
@@ -108,7 +108,6 @@ module Ontrac::WebServices
         if (status.empty? || status != "1" || response_xml.xpath("//PackageData/Status != 1"))
           msg = "No status information was returned for the request"    if (status.empty?)
           msg = message || "The request returned a status of #{status}" if (status != "1")
-
           msg << " -- " + [ *package_messages.to_a ] * " ; " if (!package_messages.empty?)
 
           raise msg
