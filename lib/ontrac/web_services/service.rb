@@ -106,9 +106,13 @@ module Ontrac::WebServices
         package_messages = response_xml.xpath("//PackageData/Message")
 
         if (status.empty? || status != "1" || response_xml.xpath("//PackageData/Status != 1"))
-          msg = "No status information was returned for the request"    if (status.empty?)
-          msg = message || "The request returned a status of #{status}" if (status != "1")
-          msg << " -- " + [ *package_messages.to_a ] * " ; " if (!package_messages.empty?)
+          if (status.empty? && message.empty?)
+            msg = "OnTrac's label system returned an invalid response"
+          else
+            msg = "No status information was returned for the request"    if (status.empty?)
+            msg = message || "The request returned a status of #{status}" if (status != "1")
+            msg << " -- " + [ *package_messages.to_a ] * " ; " if (!package_messages.empty?)
+          end
 
           raise msg
         end
