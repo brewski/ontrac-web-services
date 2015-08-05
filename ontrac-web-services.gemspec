@@ -17,6 +17,5 @@ Gem::Specification.new do |gem|
   gem.version       = Ontrac::VERSION
 
   gem.required_ruby_version = '>= 1.9.0'
-  gem.add_dependency("activesupport")
   gem.add_dependency("nokogiri")
 end
