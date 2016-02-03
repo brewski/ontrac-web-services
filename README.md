@@ -1,6 +1,6 @@
 # ontrac-web-services
 ## Description
-This gem provides an interface to the OnTrac web services API.  It interfaces with its HTTP/POST API to generate labels (looking up shipping rates and tracking coming soon).
+This gem provides an interface to the OnTrac web services API.  It interfaces with its HTTP/POST API to generate labels.
 
 ## Examples
 ### Creating a shipment with multiple packages
@@ -51,8 +51,12 @@ This gem provides an interface to the OnTrac web services API.  It interfaces wi
         File.open("#{tracking_number}.pdf", "w") { |f| f << label }
         puts "charge: #{charge}"
       end
-    rescue
-      puts debug_output
-      raise
+    rescue ServiceException => err
+      $stderr.puts err.message, ""
+      $stderr.puts "Debug Output:", debug_output, ""
+      $stderr.puts "Root Error:", err.root_error, ""
+      $stderr.puts "Sub Errors:", err.sub_errors, ""
+      $stderr.puts "Backtrace:", $!.backtrace
     end
+
 ```
