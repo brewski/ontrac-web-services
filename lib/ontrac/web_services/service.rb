@@ -52,14 +52,14 @@ module Ontrac::WebServices
 
         shipment_request.UID = SecureRandom.hex(16)
         shipment_request.COD ||= 0
-        shipment_request.CODType ||= COD_TYPE_NONE
+        shipment_request.CODType ||= Definitions::COD_TYPE_NONE
         shipment_request.BillTo ||= 0
         shipment_request.Instructions ||= ""
         shipment_request.Reference ||= ""
         shipment_request.Reference2 ||= ""
         shipment_request.Reference3 ||= ""
         shipment_request.Tracking ||= ""
-        shipment_request.DIM ||= Dim.new(0, 0, 0)
+        shipment_request.DIM ||= Definitions::Dim.new(0, 0, 0)
         shipment_request.ShipEmail ||= ""
         shipment_request.DelEmail ||= ""
       end
