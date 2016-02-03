@@ -6,10 +6,22 @@ require 'securerandom'
 
 module Ontrac::WebServices
   class ServiceException < Exception
+    attr_accessor :root_error, :sub_errors
   end
 
   class Service
-    Credentials = Struct.new(:account, :password, :environment)
+    class Credentials
+      attr_reader :account, :password, :environment
+
+      def initialize(account, password, environment)
+        @account = account or
+            raise ArgumentError.new("Missing OnTrac credential: account")
+        @password = password or
+            raise ArgumentError.new("Missing OnTrac credential: account")
+        @environment = environment or
+            raise ArgumentError.new("Missing OnTrac credential: environment")
+      end
+    end
 
     attr_accessor :debug_output
 
@@ -94,11 +106,18 @@ module Ontrac::WebServices
 
       def check_response(response_xml)
         root_error = response_xml.xpath("/OnTracShipmentResponse/Error").text
-        shipment_errors = response_xml.xpath("//Shipment/Error")
+        erred_shipments = response_xml.xpath("//Shipment[./Error != '']")
 
-        return if (root_error.empty? && shipment_errors.all? { |err| err.text.empty? })
+        return if (root_error.empty? && erred_shipments.empty?)
 
-        raise ServiceException.new("OnTrac shipping error: #{root_error}")
+        err = ServiceException.new("OnTrac responded with an error")
+        err.root_error = root_error
+        err.sub_errors = Hash[
+          erred_shipments.map do |shipment_response|
+            [ shipment_response.xpath("./UID").text, shipment_response.xpath("./Error").text ]
+          end
+        ]
+        raise err
       end
   end
 end
