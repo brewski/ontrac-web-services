@@ -10,18 +10,9 @@ module Ontrac::WebServices
   end
 
   class Service
-    class Credentials
-      attr_reader :account, :password, :environment
+    Credentials = Struct.new(:account, :password)
 
-      def initialize(account, password, environment)
-        @account = account or
-            raise ArgumentError.new("Missing OnTrac credential: account")
-        @password = password or
-            raise ArgumentError.new("Missing OnTrac credential: account")
-        @environment = environment or
-            raise ArgumentError.new("Missing OnTrac credential: environment")
-      end
-    end
+    API_BASE_URL = "https://www.shipontrac.net/OnTracWebServices/OnTracServices.svc/V2"
 
     attr_accessor :debug_output
 
@@ -31,12 +22,8 @@ module Ontrac::WebServices
     end
 
     def service_url(service_name)
-      url_base = (@credentials.environment.to_sym == :production) ?
-          "https://www.shipontrac.net/OnTracWebServices/OnTracServices.svc/V2" :
-          "https://www.shipontrac.net/OnTracTestWebServices/OnTracServices.svc/V2"
-
       "%s/%s/%s?pw=%s" % [
-        url_base, @credentials.account, service_name, CGI.escape(@credentials.password)
+        API_BASE_URL, @credentials.account, service_name, CGI.escape(@credentials.password)
       ]
     end
 
